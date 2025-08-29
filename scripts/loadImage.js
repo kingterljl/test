@@ -1,18 +1,19 @@
-// 与控制端一致
-const SERVER = "https://www.ljlcszy.cn";
-const DEFAULT_IMG = "https://kingterljl.github.io/test/images/cs.jpg";
+(() => {
+  const SERVER      = "https://www.ljlcszy.cn";
+  const DEFAULT_IMG = "https://kingterljl.github.io/test/images/cs.jpg";
+  const imgEl = document.getElementById("mainImg");
 
-const imgEl = document.getElementById('mainImg');
+  // 首次拉一次
+  fetch(`${SERVER}/api/current`, { cache: "no-store" })
+    .then(r => r.json())
+    .then(s => { imgEl.src = (s && s.img) || DEFAULT_IMG; })
+    .catch(() => { imgEl.src = DEFAULT_IMG; });
 
-
-// 1) 首次打开，从服务器取当前状态
-fetch(`${SERVER}/api/current`, { cache: 'no-store' })
-  .then(r => r.json())
-  .then(s => imgEl.src = s.img || DEFAULT_IMG)
-  .catch(() => imgEl.src = DEFAULT_IMG);
-
-// 订阅服务器推送
-const socket = io("https://www.ljlcszy.cn", {  transports: ["websocket"] });
-socket.on("update_image", (s) => { if (s && s.img) imgEl.src = s.img; });
-
-
+  // 订阅推送
+  const socket = io(SERVER, { path: "/wsio/", transports: ["websocket","polling"] });
+  socket.on("connect", () => console.log("[display] socket connected"));
+  socket.on("update_image", (s) => {
+    console.log("[display] update_image", s);
+    if (s && s.img) imgEl.src = s.img;         // 已带 ?t= 防缓存（见后端）
+  });
+})();
