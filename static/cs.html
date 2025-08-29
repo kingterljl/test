@@ -1,68 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        font-family: "Times New Roman", sans-serif;
-        font-size: 22px;
-      }
-    </style>
-    <style>
-      h1 {
-        margin: 0;
-        padding: 0px 0;
-        color: #00539f;
-        text-shadow: 3px 3px 1px black;
-      }
-    </style>
-  </head>
-  <img>
-    <!-- <style>
-  p {
-    color: red;
-    width: 500px;
-    border: 1px solid black;
-  }
-</style> -->
-    <!-- <style>
-      li,
-      p {
-        color: red;
-      }
-    </style> -->
-    <p>asd</p>
-    <p>My cat is <strong>very</strong> grumpy.</p>
-<img id="mainImg" src="../images/cs.jpg" alt="测试图片" style="display:block; margin:0 auto;">
-    <p>At Mozilla, we're a global community of</p>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>展示：当前图片</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto; padding: 24px; text-align: center; }
+    img  { max-width: min(90vw, 900px); height: auto; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    .tip { margin-top: 10px; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>展示页</h1>
+  <img id="mainImg" alt="展示图片" />
 
-    <ul>
-      <li>technologists</li>
-      <li>thinkers</li>
-      <li>builders</li>
-    </ul>
+  <div class="tip">打开 <code>css.html</code> 点击按钮会切换本页图片；刷新也能保持。</div>
 
-    <p>working together…</p>
-    <a href="css.html">
-      Mozilla Manifesto
-    </a>
-    <p style="color: rgb(255, 0, 0); width: 100px; border: 1px solid black">
-      asd
-    </p>
-    <h1>asd</h1>
-<div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch;">
-  asd
-  asd
-</div>
+  <!-- 如已部署 Socket.IO（可选）： -->
+   <script src="https://www.ljlcszy.cn/socket.io/socket.io.min.js"></script> 
 
-    <script src="../scripts/main.js"></script>
-<script src="../scripts/loadImage.js"></script>
- <script src="/socket.io/socket.io.js"></script>
-  </body>
+  <script src="../scripts/loadImage.js"></script>
+</body>
 </html>
