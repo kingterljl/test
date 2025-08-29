@@ -12,8 +12,8 @@ fetch(`${SERVER}/api/current`, { cache: 'no-store' })
   .catch(() => imgEl.src = DEFAULT_IMG);
 
 // 订阅服务器推送
-const socket = io(SERVER, {
-  path: "/wsio/",                     // ← 新增
+const socket = io(SERVER, {                    // ← 新增
   transports: ["websocket", "polling"]
 });
 socket.on("update_image", (s) => { if (s && s.img) imgEl.src = s.img; });
+
