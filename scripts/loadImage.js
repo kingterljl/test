@@ -1,31 +1,17 @@
-// 默认图片（当 localStorage 里没值时使用）
+// 与控制端一致
+const SERVER = "https://www.ljlcszy.cn";   // 若无证书，临时 http://
 const DEFAULT_IMG = "https://kingterljl.github.io/test/images/cs.jpg";
 
-// （可选）Socket.IO 服务地址（和控制页保持一致即可）
-const SOCKET_ENDPOINT = "wss://www.ljlcszy.cn";   // 没有就留空字符串 ""
-// const SOCKET_ENDPOINT = "";
+const imgEl = document.getElementById('mainImg');
 
-function setImage(src) {
-  const img = document.getElementById("mainImg");
-  if (img) img.src = src;
-}
+// 1) 首次打开，从服务器取当前状态
+fetch(`${SERVER}/api/current`, { cache: 'no-store' })
+  .then(r=>r.json())
+  .then(s=> imgEl.src = s.img || DEFAULT_IMG)
+  .catch(()=> imgEl.src = DEFAULT_IMG);
 
-// 首次加载：从 localStorage 读取
-document.addEventListener("DOMContentLoaded", () => {
-  const saved = localStorage.getItem("csImage");
-  setImage(saved || DEFAULT_IMG);
-
-  // 如果有后端 Socket.IO，就订阅实时事件
-  try {
-    if (typeof io === "function" && SOCKET_ENDPOINT) {
-      const socket = io(SOCKET_ENDPOINT, { transports: ["websocket", "polling"] });
-      socket.on("switch_image", (payload) => {
-        if (payload && payload.img) {
-          localStorage.setItem("csImage", payload.img);
-          setImage(payload.img);
-          console.log("[switch_image] ->", payload.img);
-        }
-      });
-    }
-  } catch (_) { /* 忽略 */ }
+// 2) 监听服务器广播（服务端转发控制端命令）
+const socket = io(SERVER, { transports: ['websocket','polling'] });
+socket.on("update_image", (s)=>{
+  if(s && s.img){ imgEl.src = s.img; }
 });
