@@ -1,19 +1,34 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>展示端</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto;text-align:center;padding:24px}
-    img{max-width:min(90vw,900px);height:auto;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-  </style>
-</head>
-<body>
-  <h1>当前图片</h1>
-  <img id="mainImg" alt="loading..." />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>展示端</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto;text-align:center;padding:24px}
+  img{max-width:min(90vw,90vh);height:auto;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+</style>
 
-  <script src="../scripts/socket.io.min.js"></script>
-  <script src="../scripts/loadImage.js"></script>
-</body>
-</html>
+<h1>当前图片</h1>
+<img id="mainImg" alt="loading..." />
+
+<!-- Socket.IO v4 客户端（CDN） -->
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js" crossorigin="anonymous"></script>
+<script>
+  const SERVER      = "https://www.ljlcszy.cn";
+  const DEFAULT_IMG = "https://kingterljl.github.io/test/images/cs.jpg";
+  const imgEl = document.getElementById('mainImg');
+
+  // 1) 首次拉取当前状态
+  fetch(`${SERVER}/api/current`, { cache: 'no-store' })
+    .then(r => r.json())
+    .then(s => { imgEl.src = (s && s.img) || DEFAULT_IMG; })
+    .catch(() => { imgEl.src = DEFAULT_IMG; });
+
+  // 2) 订阅推送（用 /wsio/）
+  const socket = io(SERVER, { path: "/wsio/", transports: ["websocket","polling"] });
+  socket.on("connect",       () => console.log("[display] socket connected"));
+  socket.on("connect_error", e  => console.warn("[display] connect_error", e));
+  socket.on("update_image", (s) => {
+    console.log("[display] update_image", s);
+    if (s && s.img) imgEl.src = s.img;   // 后端已带 ?t= 防缓存
+  });
+</script>
