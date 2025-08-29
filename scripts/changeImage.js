@@ -4,7 +4,6 @@ const ADMIN_TOKEN = "CHANGE_ME_very_secret";
 const REPO_BASE  = "https://kingterljl.github.io/test/images/";
 
 const socket = io(SERVER, {
-  path: "/wsio/",                     // ← 新增
   transports: ["websocket", "polling"]
 });
 
@@ -21,4 +20,5 @@ function switchTo(nameOrUrl){
 
 // 可选：收到后端错误
 socket.on("error_msg", (e)=> console.warn("[server error]", e));
+
 
