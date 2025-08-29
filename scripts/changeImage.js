@@ -1,24 +1,28 @@
-// === 必改：你的服务器地址（HTTPS 已生效时用 wss/https） ===
-const SERVER = "https://www.ljlcszy.cn";
-const ADMIN_TOKEN = "CHANGE_ME_very_secret";
-const REPO_BASE  = "https://kingterljl.github.io/test/images/";
+// scripts/changeImage.js
+(() => {
+  // 你的后端域名
+  const SERVER      = "https://www.ljlcszy.cn";
+  // 必须与 app.py 的 ADMIN_TOKEN 完全一致
+  const ADMIN_TOKEN = "CHANGE_ME_very_secret";
+  // 你的 GitHub Pages 图片目录，注意末尾一定带 '/'
+  const REPO_BASE   = "https://kingterljl.github.io/test/images/";
 
-const socket = io(SERVER, {
-  transports: ["websocket", "polling"]
-});
+  // 如果你按我之前建议用了别名路径 /wsio/，就保留 path 这一行；
+  // 如果还是默认 /socket.io/，把 path 这一行删掉即可。
+  const socket = io(SERVER, {
+    path: "/wsio/",
+    transports: ["websocket", "polling"]
+  });
 
-// 发送“切图命令”给服务器，由服务器广播给展示端
-function switchTo(nameOrUrl){
-  const payload = {
-    token: ADMIN_TOKEN,
-    img: nameOrUrl,       // 可是完整URL或简名
-    repo_base: REPO_BASE, // 当 img 不是URL时，后端会用它拼接
+  socket.on("connect",       () => console.log("[control] socket connected"));
+  socket.on("connect_error", e  => console.warn("[control] connect_error", e));
+  socket.on("error_msg",     e  => console.warn("[server error]", e));
+
+  // 暴露给 HTML 的按钮调用
+  window.switchTo = function(nameOrUrl){
+    if (!nameOrUrl) return;
+    const payload = { token: ADMIN_TOKEN, img: nameOrUrl, repo_base: REPO_BASE };
+    console.log("[control] emit switch_image:", payload);
+    socket.emit("switch_image", payload);
   };
-  socket.emit("switch_image", payload);
-  console.log("[control] emit switch_image:", payload);
-}
-
-// 可选：收到后端错误
-socket.on("error_msg", (e)=> console.warn("[server error]", e));
-
-
+})();
