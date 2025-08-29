@@ -1,108 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Flex Demo</title>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>控制台：切换图片</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto; padding: 24px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+    button { padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+    input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; width: 360px; }
+    small { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>控制台</h1>
+  <p>点击下面按钮切换展示页图片（<code>cs.html</code>）。</p>
 
-    <style>
-      .container {
-        display: flex;
-        flex-direction: row;
-        align-items: center; /* 子元素在纵向居中 */
-        height: 100px;
-        border: 1px solid black;
-        margin-bottom: 20px;
-        justify-content: center;
-      }
+  <div class="row">
+    <button onclick="switchTo('../images/cs.jpg')">切到：cs.jpg</button>
+    <button onclick="switchTo('../images/cs2.jpg')">切到：cs2.jpg</button>
+  </div>
 
-      .box {
-        width: 50px;
-        height: 50px;
-        background-color: lightblue;
-        margin: 5px;
-        text-align: center;
-        line-height: 50px;
-        font-weight: bold;
-        color: black;
-        text-decoration: none;
-      }
+  <h3 style="margin-top: 24px;">自定义 URL</h3>
+  <div class="row">
+    <input id="customUrl" placeholder="可填写完整图片 URL（含 https://）" />
+    <button onclick="switchCustom()">切到自定义图片</button>
+  </div>
+  <small>若填写完整 URL，将忽略下方仓库前缀。</small>
 
-      a.box:hover {
-        width: 50px;
-        height: 50px;
-        background-color: lightblue;
-        margin: 5px;
-        text-align: center;
-        line-height: 50px;
-        font-weight: bold;
-        color: red;
-        text-decoration: none;
-      }
+  <!-- 如果你已部署后端 Socket.IO，并用 HTTPS： -->
+   <script src="https://www.ljlcszy.cn/socket.io/socket.io.min.js"></script> 
 
-      /* 不同对齐方式 */
-      .start {
-        justify-content: flex-start;
-      }
-      .center {
-        justify-content: center;
-      }
-      .between {
-        justify-content: space-between;
-      }
-      .around {
-        justify-content: space-around;
-      }
-      .evenly {
-        justify-content: space-evenly;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>flex-start</h2>
-    <div class="container start">
-      <div class="box">1</div>
-      <div class="box">2</div>
-      <div class="box">3</div>
-    </div>
-
-    <h2>center</h2>
-    <div class="container center">
-      <div class="box">1</div>
-      <div class="box">2</div>
-      <div class="box">3</div>
-      <a href="cs.html" class="box">4</a>
-    </div>
-
-    <h2>space-between</h2>
-    <div class="container between">
-      <div class="box">1</div>
-      <div class="box">2</div>
-      <div class="box">3</div>
-    </div>
-
-    <h2>space-around</h2>
-    <div class="container around">
-      <div class="box">1</div>
-      <div class="box">2</div>
-      <div class="box">3</div>
-    </div>
-
-    <h2>space-evenly</h2>
-    <div class="container evenly">
-      <div class="box">1</div>
-      <div class="box">2</div>
-      <div class="box">3</div>
-    </div>
-    <div class="box">盒子</div>
-
-    <h2>flex-start</h2>
-    <div class="container">
-      <div class="box">1</div>
-      <div class="box">2</div>
-      <div class="box">3</div>
-    </div>
-    <button onclick="changeImage()">切换图片</button>
-  </body>
   <script src="../scripts/changeImage.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    function switchCustom() {
+      const v = document.getElementById('customUrl').value.trim();
+      if (!v) return alert('请输入图片 URL');
+      // 传入完整 URL，changeImage.js 会识别并直接使用
+      switchTo(v);
+    }
+  </script>
+</body>
 </html>
