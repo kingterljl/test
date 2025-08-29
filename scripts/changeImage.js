@@ -1,9 +1,12 @@
 // === 必改：你的服务器地址（HTTPS 已生效时用 wss/https） ===
-const SERVER = "https://www.ljlcszy.cn";     // 若暂时无证书，可用 http://www.ljlcszy.cn
-const ADMIN_TOKEN = "CHANGE_ME_very_secret";  // 必须与 app.py 一致
-const REPO_BASE  = "https://kingterljl.github.io/test/images/"; // 简名时的前缀，可改
+const SERVER = "https://www.ljlcszy.cn";
+const ADMIN_TOKEN = "CHANGE_ME_very_secret";
+const REPO_BASE  = "https://kingterljl.github.io/test/images/";
 
-const socket = io(SERVER, { transports: ['websocket','polling'] });
+const socket = io(SERVER, {
+  path: "/wsio/",                     // ← 新增
+  transports: ["websocket", "polling"]
+});
 
 // 发送“切图命令”给服务器，由服务器广播给展示端
 function switchTo(nameOrUrl){
@@ -18,3 +21,4 @@ function switchTo(nameOrUrl){
 
 // 可选：收到后端错误
 socket.on("error_msg", (e)=> console.warn("[server error]", e));
+
