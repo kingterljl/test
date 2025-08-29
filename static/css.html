@@ -1,39 +1,48 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>控制端</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto;padding:24px}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    button{padding:10px 14px;border:1px solid #ddd;border-radius:8px;cursor:pointer}
-    input{padding:10px;border:1px solid #ddd;border-radius:8px;min-width:360px}
-  </style>
-</head>
-<body>
-  <h1>控制端</h1>
-  <div class="row" style="margin:16px 0">
-    <button onclick="switchTo('cs.jpg')">切到 cs.jpg</button>
-    <button onclick="switchTo('cs2.jpg')">切到 cs2.jpg</button>
-  </div>
-  <div class="row">
-    <input id="custom" placeholder="输入完整图片URL或简名（如 xxx.jpg）" />
-    <button onclick="switchCustom()">切到自定义</button>
-  </div>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>控制端</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto;padding:24px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  button{padding:10px 14px;border:1px solid #ddd;border-radius:8px;cursor:pointer}
+  input{padding:10px;border:1px solid #ddd;border-radius:8px;min-width:360px}
+</style>
 
-  <!-- 从你的域名提供的 socket.io 客户端（Nginx 反代即可访问） -->
-  <script src="../scripts/socket.io.min.js"></script>
-  <script src="../scripts/changeImage.js"></script>
-  <script>
-    function switchCustom(){
-      const v = document.getElementById('custom').value.trim();
-      if(!v) return alert('请输入图片地址或文件名');
-      switchTo(v);
-    }
-  </script>
-</body>
-</html>
+<h1>控制端</h1>
+<div class="row" style="margin:16px 0">
+  <button onclick="switchTo('cs.jpg')">切到 cs.jpg</button>
+  <button onclick="switchTo('cs2.jpg')">切到 cs2.jpg</button>
+</div>
+<div class="row">
+  <input id="custom" placeholder="输入完整图片URL或简名（如 xxx.jpg）" />
+  <button onclick="switchCustom()">切到自定义</button>
+</div>
 
+<!-- Socket.IO v4 客户端（CDN） -->
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js" crossorigin="anonymous"></script>
+<script>
+  // ★ 根据你的后端修改这三项
+  const SERVER      = "https://www.ljlcszy.cn";                      // 你的域名
+  const ADMIN_TOKEN = "CHANGE_ME_very_secret";                       // 必须与 app.py 一致
+  const REPO_BASE   = "https://kingterljl.github.io/test/images/";   // 末尾一定有 /
 
+  // 走自定义路径 /wsio/，避免默认 /socket.io/ 被拦
+  const socket = io(SERVER, { path: "/wsio/", transports: ["websocket","polling"] });
 
+  socket.on("connect",       () => console.log("[control] socket connected"));
+  socket.on("connect_error", e  => console.warn("[control] connect_error", e));
+  socket.on("error_msg",     e  => console.warn("[server error]", e));  // token 不对会报 forbidden
+
+  // 点击按钮用
+  function switchTo(nameOrUrl){
+    const payload = { token: ADMIN_TOKEN, img: nameOrUrl, repo_base: REPO_BASE };
+    console.log("[control] emit switch_image:", payload);
+    socket.emit("switch_image", payload);
+  }
+  function switchCustom(){
+    const v = document.getElementById('custom').value.trim();
+    if(!v) return alert('请输入图片地址或文件名');
+    switchTo(v);
+  }
+</script>
