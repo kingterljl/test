@@ -13,7 +13,7 @@
 <!-- Socket.IO v4 客户端（CDN） -->
 <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" crossorigin="anonymous"></script>
 <script>
-  const SERVER      = "https://www.ljlcszy.cn";
+  const SERVER = "https://www.ljlcszy.cn:8443";
   const DEFAULT_IMG = "https://kingterljl.github.io/test/images/cs.jpg";
   const imgEl = document.getElementById('mainImg');
 
@@ -24,7 +24,11 @@
     .catch(() => { imgEl.src = DEFAULT_IMG; });
 
   // 2) 订阅推送（用 /wsio/）
-  const socket = io(SERVER, { path: "/wsio/", transports: ["websocket","polling"] });
+  const socket = io("https://www.ljlcszy.cn:8443", {
+  path: "/wsio/",
+  transports: ["polling","websocket"],   // 先轮询再升级
+  reconnection: true
+});
   socket.on("connect",       () => console.log("[display] socket connected"));
   socket.on("connect_error", e  => console.warn("[display] connect_error", e));
   socket.on("update_image", (s) => {
@@ -32,3 +36,4 @@
     if (s && s.img) imgEl.src = s.img;   // 后端已带 ?t= 防缓存
   });
 </script>
+
