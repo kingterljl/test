@@ -7,6 +7,7 @@
   .row{display:flex;gap:12px;flex-wrap:wrap}
   button{padding:10px 14px;border:1px solid #ddd;border-radius:8px;cursor:pointer}
   input{padding:10px;border:1px solid #ddd;border-radius:8px;min-width:360px}
+  pre{max-width:960px;margin-top:16px;background:#111;color:#0f0;padding:12px;border-radius:8px}
 </style>
 
 <h1>控制端</h1>
@@ -18,26 +19,27 @@
   <input id="custom" placeholder="输入完整图片URL或简名（如 xxx.jpg）" />
   <button onclick="switchCustom()">切到自定义</button>
 </div>
+<pre id="log"></pre>
 
 <!-- Socket.IO v4 客户端（CDN） -->
 <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" crossorigin="anonymous"></script>
 <script>
-  // ★ 根据你的后端修改这三项
-  const SERVER = "https://www.ljlcszy.cn:8443";                     // 你的域名
+  const SERVER = "https://www.ljlcszy.cn:8443";                     // 你的域名（HTTPS）
   const ADMIN_TOKEN = "CHANGE_ME_very_secret";                       // 必须与 app.py 一致
   const REPO_BASE   = "https://kingterljl.github.io/test/images/";   // 末尾一定有 /
+  const logEl = document.getElementById('log');
+  function logLine(...a){ logEl.textContent += a.join(' ') + '\n'; logEl.scrollTop = logEl.scrollHeight; }
 
-  // 走自定义路径 /wsio/，避免默认 /socket.io/ 被拦
-  const socket = io(SERVER, { path: "/wsio/", transports: ["websocket","polling"] });
+  // 走自定义路径 /wsio/
+  const socket = io(SERVER, { path: "/wsio/", transports: ["websocket","polling"], reconnection: true });
 
-  socket.on("connect",       () => console.log("[control] socket connected"));
-  socket.on("connect_error", e  => console.warn("[control] connect_error", e));
-  socket.on("error_msg",     e  => console.warn("[server error]", e));  // token 不对会报 forbidden
+  socket.on("connect",       () => logLine("[control] socket connected", socket.id));
+  socket.on("connect_error", e  => logLine("[control] connect_error", e && (e.message || e)));
+  socket.on("error_msg",     e  => logLine("[server error]", JSON.stringify(e)));
 
-  // 点击按钮用
   function switchTo(nameOrUrl){
     const payload = { token: ADMIN_TOKEN, img: nameOrUrl, repo_base: REPO_BASE };
-    console.log("[control] emit switch_image:", payload);
+    logLine("[control] emit switch_image:", JSON.stringify(payload));
     socket.emit("switch_image", payload);
   }
   function switchCustom(){
@@ -46,4 +48,3 @@
     switchTo(v);
   }
 </script>
-
