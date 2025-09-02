@@ -31,9 +31,11 @@
 });
   socket.on("connect",       () => console.log("[display] socket connected"));
   socket.on("connect_error", e  => console.warn("[display] connect_error", e));
-  socket.on("update_image", (s) => {
-    console.log("[display] update_image", s);
-    if (s && s.img) imgEl.src = s.img;   // 后端已带 ?t= 防缓存
-  });
+socket.on("update_image", (s) => {
+  console.log("[display] update_image", s);
+  const next = s && (s.img || s.url);   // 两种都支持
+  if (next) imgEl.src = next;
+});
 </script>
+
 
